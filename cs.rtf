@@ -310,7 +310,8 @@
 	       (loop (+ index 1)
 		     (nexthash hash (car rst) index modulus)
 		     (cdr rst))))))))
-//Problem 1
+		     
+;;Problem 1
 (define rsa-unconvert-list
     (lambda ((lst <list>) (key <key>))
       (let ((n (key-modulus key)))
@@ -320,7 +321,8 @@
                  (let ((cur (- (rsa-transform (modulo (car rst) n) key) prev)))
                    (cons cur 
                          (loop (cdr rst) (car rst))))))))))
-//problem 2
+                         
+;;Problem 2
 (define encrypt-and-sign
   (lambda ((message <string>) (public-key <key>) (private-key <key>))
     (let ((body (rsa-encrypt message public-key)))
@@ -345,6 +347,23 @@
 ;; A compression function suitable for 18-bit integers
 (define compress (make-compression-func 18));
 
+
+;;Problem 3
+(define crack-rsa
+    (lambda ((key <key>))
+      (crack-rsa-helper key 0)))
+  
+(define crack-rsa-helper
+  (lambda ((key <key>) (k 0))
+  (let ((p (smallest-divisor (key-modulus key)))
+        (q (/ (key-modulus key) (smallest-divisor (key-modulus key))))
+        (m (* (- (smallest-divisor (key-modulus key)) 1) (- (/ (key-modulus key) (smallest-divisor (key-modulus key))) 1)))
+        (e (key-exponent key)))
+    (let ((d (/ (+ (* k m) 1) e)))
+       (if(integer? d)
+          (make-key d (key-modulus key))
+          (crack-rsa-helper key (+ k 1)))))))
+          
 
 ;; ----- Test data and sample keys -----
 
