@@ -344,10 +344,6 @@
               msg
               #f))))
 
-;; A compression function suitable for 18-bit integers
-(define compress (make-compression-func 18));
-
-
 ;;Problem 3
 (define crack-rsa
     (lambda ((key <key>))
@@ -364,6 +360,10 @@
           (make-key d (key-modulus key))
           (crack-rsa-helper key (+ k 1)))))))
           
+
+;; A compression function suitable for 18-bit integers
+(define compress (make-compression-func 18));
+
 
 ;; ----- Test data and sample keys -----
 
