@@ -310,7 +310,7 @@
 	       (loop (+ index 1)
 		     (nexthash hash (car rst) index modulus)
 		     (cdr rst))))))))
-
+//Problem 1
 (define rsa-unconvert-list
     (lambda ((lst <list>) (key <key>))
       (let ((n (key-modulus key)))
@@ -320,7 +320,7 @@
                  (let ((cur (- (rsa-transform (modulo (car rst) n) key) prev)))
                    (cons cur 
                          (loop (cdr rst) (car rst))))))))))
-
+//problem 2
 (define encrypt-and-sign
   (lambda ((message <string>) (public-key <key>) (private-key <key>))
     (let ((body (rsa-encrypt message public-key)))
