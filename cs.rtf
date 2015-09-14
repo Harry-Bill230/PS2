@@ -7,3 +7,28 @@
                  (let ((cur (- (rsa-transform (modulo (car rst) n) key) prev)))
                    (cons cur 
                          (loop (cdr rst) (car rst))))))))))
+                         
+(define encrypt-and-sign
+  (lambda ((message <string>) (public-key <key>) (private-key <key>))
+    (let (body (rsa-encrypt message public-key))
+    	(append body (list (signature body private-key))))))
+
+(define signature
+	(lambda ((body <list>) (key <key>))
+		(let (n (key-modulo key))
+			(modulo (sumOfBody body index) 262139)))
+
+(define sumOfBody
+	(lambda ((body <list>) (index <integer))
+		(if (null? (cdr body))
+			(* (car body) index)
+			(+ (* (car body) (car body) index) (sum (cdr body) (index+1))))))
+
+(define signed-message-body
+	(lambda ((list <list>))
+		(remove (last list) list)))
+
+(define signed-message-signature
+	(lambda ((list <list>))
+		(last list)))
+
