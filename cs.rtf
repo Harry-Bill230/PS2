@@ -310,37 +310,27 @@
 	       (loop (+ index 1)
 		     (nexthash hash (car rst) index modulus)
 		     (cdr rst))))))))
-		     
-;;Problem 1
+
 (define rsa-unconvert-list
     (lambda ((lst <list>) (key <key>))
       (let ((n (key-modulus key)))
         (let loop ((rst lst) (prev 0))
           (cond ((null? rst) rst)
                 (else
-                 (let ((cur (- (rsa-transform (modulo (car rst) n) key) prev)))
+                 (let ((cur (modulo (- (rsa-transform (car rst) key) prev) n)))
                    (cons cur 
                          (loop (cdr rst) (car rst))))))))))
-                         
-;;Problem 2
+
 (define encrypt-and-sign
   (lambda ((message <string>) (public-key <key>) (private-key <key>))
     (let ((body (rsa-encrypt message public-key)))
-    	(append (rsa-convert-list (list (compress body public-key)) private-key) body))))
-
-(define signed-message-body
-	(lambda ((list <list>))
-		(cdr list)))
-
-(define signed-message-signature
-	(lambda ((list <list>))
-		(car list)))
+    	(make-signed-message body (car (rsa-convert-list (list (compress body public-key)) private-key))))))
 
 (define decrypt-and-verify
   (lambda ((lst <list>) (private-key <key>) (public-key <key>))
-    (let ((sign (rsa-unconvert-list (list (car lst)) public-key))
-          (msg (rsa-decrypt (cdr lst) private-key)))
-          (if (equal? (list (compress (cdr lst) public-key)) sign)
+    (let ((sign (rsa-transform (modulo (signed-message-signature lst) (key-modulus public-key)) public-key))
+          (msg (rsa-decrypt (signed-message-body lst) private-key)))
+          (if (equal? (compress (car lst) public-key) sign)
               msg
               #f))))
 
@@ -359,27 +349,6 @@
        (if(integer? d)
           (make-key d (key-modulus key))
           (crack-rsa-helper key (+ k 1)))))))
-
-;; Problem 5
-(define pollard
-  (lambda ((n <odd>) (base <integer>) (max <integer>))
-    (pollard-helper n base max 1)))
-
-(define pollard-helper
-  (lambda ((n <odd>) (base <integer>) (max <integer>) (k <integer>))
-      (let ((d (last (euclid (- (comptr n base k) 1) n))))
-        (if (or (eq? d 1) (eq? d n))
-            (if (= k max)
-                #f
-                (pollard-helper n base max (+ 1 k)))
-               d))))
-
-(define comptr
-  (lambda ((n <odd>)(base <integer>)(k <integer>))
-      (if(= k 1)
-         (modulo base n)
-         (modulo (expt (comptr n base (- k 1)) k) n))))
-
 
 ;; A compression function suitable for 18-bit integers
 (define compress (make-compression-func 18));
