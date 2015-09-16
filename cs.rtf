@@ -338,38 +338,57 @@
 (define crack-rsa
     (lambda ((key <key>))
       (crack-rsa-helper key 0)))
-  
+      
 (define crack-rsa-helper
-  (lambda ((key <key>) (k 0))
-  (let ((p (smallest-divisor (key-modulus key)))
-        (q (/ (key-modulus key) (smallest-divisor (key-modulus key))))
-        (m (* (- (smallest-divisor (key-modulus key)) 1) (- (/ (key-modulus key) (smallest-divisor (key-modulus key))) 1)))
+  (lambda ((key <key>) (i <integer>))
+    (let ((fac (smallest-divisor (key-modulus key))))
+  (let ((p fac)
+        (q (/ (key-modulus key) fac))
+        (m (* (- fac 1) (- (/ (key-modulus key) fac) 1)))
         (e (key-exponent key)))
-    (let ((d (/ (+ (* k m) 1) e)))
+    (let ((d (/ (+ (* i m) 1) e)))
        (if(integer? d)
           (make-key d (key-modulus key))
-          (crack-rsa-helper key (+ k 1)))))))
+          (crack-rsa-helper key (+ i 1))))))))
           
 ;; Problem 5
 (define pollard
   (lambda ((n <odd>) (base <integer>) (max <integer>))
     (letrec ((iter
-              (lambda ((r <integer>) (k <integer))
+              (lambda ((r <integer>) (k <integer>))
                 (if (equal? k 1)
                     (let ((res (modulo base n)))
                       (let ((d (last (euclid (- res 1) n))))
                         (if (or (eq? d 1) (eq? d n))
-                            (if (= k max)
+                            (if (eq? k max)
                                 #f
                                 (iter (modulo (expt res (+ k 1)) n) (+ 1 k)))
                             d)))
                     (let ((d (last (euclid (- r 1) n))))
                       (if (or (eq? d 1) (eq? d n))
-                          (if (= (- k 1) max)
+                          (if (eq? (- k 1) max)
                               #f
                               (iter (modulo (expt r k) n) (+ 1 k)))
                           d))))))
       (iter 0 1))))
+
+
+;; Extra Credit 
+(define crack-rsa-2-helper
+  (lambda ((key <key>) (base <integer>) (max <integer>) (i <integer>))
+    (let ((fac (pollard (key-modulus key) base max)))
+      (let ((p fac)
+            (q (/ (key-modulus key) fac))
+            (m (* (- fac 1) (- (/ (key-modulus key) fac) 1)))
+            (e (key-exponent key)))
+        (let ((d (/ (+ (* i m) 1) e)))
+          (if(integer? d)
+             (make-key d (key-modulus key))
+             (crack-rsa-2-helper key base max (+ i 1))))))))
+
+(define crack-rsa-2
+  (lambda ((key <key>) (base <integer>) (max <integer>))
+    (crack-rsa-2-helper key base max 0)))
 ;; A compression function suitable for 18-bit integers
 (define compress (make-compression-func 18));
 
