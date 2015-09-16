@@ -351,26 +351,26 @@
           (make-key d (key-modulus key))
           (crack-rsa-helper key (+ i 1))))))))
           
-;; Problem 5
 (define pollard
   (lambda ((n <odd>) (base <integer>) (max <integer>))
     (letrec ((iter
-              (lambda ((r <integer>) (k <integer>))
+              (lambda ((r <integer>) (k <integer))
                 (if (equal? k 1)
                     (let ((res (modulo base n)))
                       (let ((d (last (euclid (- res 1) n))))
                         (if (or (eq? d 1) (eq? d n))
-                            (if (eq? k max)
+                            (if (= k max)
                                 #f
-                                (iter (modulo (expt res (+ k 1)) n) (+ 1 k)))
+                                (iter (exptmod res (+ k 1) n) (+ 1 k)))
                             d)))
                     (let ((d (last (euclid (- r 1) n))))
                       (if (or (eq? d 1) (eq? d n))
-                          (if (eq? (- k 1) max)
+                          (if (= (- k 1) max)
                               #f
-                              (iter (modulo (expt r k) n) (+ 1 k)))
+                              (iter (exptmod r k n) (+ 1 k)))
                           d))))))
       (iter 0 1))))
+
 
 
 ;; Extra Credit 
