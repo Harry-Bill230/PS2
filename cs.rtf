@@ -311,6 +311,7 @@
 		     (nexthash hash (car rst) index modulus)
 		     (cdr rst))))))))
 
+;; Problem 1
 (define rsa-unconvert-list
     (lambda ((lst <list>) (key <key>))
       (let ((n (key-modulus key)))
@@ -321,6 +322,7 @@
                    (cons cur 
                          (loop (cdr rst) (car rst))))))))))
 
+;; Problem 2
 (define encrypt-and-sign
   (lambda ((message <string>) (public-key <key>) (private-key <key>))
     (let ((body (rsa-encrypt message public-key)))
@@ -350,7 +352,15 @@
        (if(integer? d)
           (make-key d (key-modulus key))
           (crack-rsa-helper key (+ i 1))))))))
-          
+
+;;Problem 4
+;;Tyler to Hunter
+(decrypt-and-verify secret-message
+                      (crack-rsa Hunter)
+                      Tyler)
+"If cryptography is outlawed, only outlaws will have cryptography."
+
+;; Problem 5
 (define pollard
   (lambda ((n <odd>) (base <integer>) (max <integer>))
     (letrec ((iter
@@ -434,9 +444,3 @@
 
 ;; ------------------------------------------------------------------------
 ;; here there be dragons
-
-;;Tyler to Hunter
-(decrypt-and-verify secret-message
-                      (crack-rsa Hunter)
-                      Tyler)
-"If cryptography is outlawed, only outlaws will have cryptography."
